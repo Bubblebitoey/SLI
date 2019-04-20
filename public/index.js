@@ -315,11 +315,28 @@ jQuery(document).ready(function ($) {
   function modifyDebugMode(debug) {
     if (debug === "true") {
       console.log("Start 'debug' mode");
-      existingGestureList.css('display', '')
+      var outputTextLeft = (windowWidth < 1000) ? 100 : 22;
+
+      existingGestureList.css({
+        'display': ''
+      })
+      gestureCreationArea.css({
+        'display': ''
+      })
+      outputText.css({
+        left: outputTextLeft
+      })
     } else {
       console.log("Start 'normal' mode");
+
       existingGestureList.css({
         display: 'none'
+      })
+      gestureCreationArea.css({
+        'display': 'none'
+      })
+      outputText.css({
+        left: '0px'
       })
     }
   }
