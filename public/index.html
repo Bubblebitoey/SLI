@@ -171,6 +171,21 @@
 
 </body>
 
+<script src="https://www.gstatic.com/firebasejs/5.10.0/firebase.js"></script>
+
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCFzymwuiLZUAlIZAy_RLpQL3JZVPjiqpE",
+    authDomain: "sign-language-interpreter-ku.firebaseapp.com",
+    databaseURL: "https://sign-language-interpreter-ku.firebaseio.com",
+    projectId: "sign-language-interpreter-ku",
+    storageBucket: "sign-language-interpreter-ku.appspot.com",
+    messagingSenderId: "381950485050"
+  };
+  firebase.initializeApp(config);
+</script>
+
 <script src="./trainer-ui/js/jquery.min.js"></script>
 <script src="./trainer-ui/js/jquery.touchwipe.min.js"></script>
 
@@ -184,7 +199,7 @@
 <!-- <script src="https://js.leapmotion.com/leap-0.6.4.min.js"></script> -->
 <!-- script src="http://js.leapmotion.com/0.2.0/leap.min.js"></script -->
 <script src="./lib/leap.js"></script>
-<script src="./lib/leap-0.6.4.min.js"></script>
+<!-- <script src="./lib/leap-0.6.4.min.js"></script> -->
 
 <script src="./leap-trainer.js"></script>
 
