@@ -5,12 +5,18 @@
   "main": "index.js",
   "repository": "https://github.com/Bubblebitoey/SLI",
   "author": "Soraya Saenna",
-  "contributors": ["Kamontat Chantrachirathumrong"],
+  "contributors": [
+    "Kamontat Chantrachirathumrong"
+  ],
   "license": "MIT",
   "scripts": {
-    "start": "http-server . -p 1234",
+    "start": "http-server . -p 3000",
+    "dev": "nodemon server.js"
   },
   "dependencies": {
+    "finalhandler": "1.1.1",
     "http-server": "0.11.1",
+    "nodemon": "1.18.11",
+    "serve-static": "1.13.2"
   }
 }
