@@ -7228,6 +7228,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
     Leap = require("./index");
 
   }, {
-    "../lib/index": 8
+    "./index": 8
   }]
 }, {}, [21]);

@@ -43,7 +43,7 @@ body 				{ font-family: Calibri; margin: 0px; -ms-touch-action: none; overflow-x
 .overlay-open #overlay-shade							{ display: block; }
 .overlay-open #overlay									{ display: block; }
 
-#output-text											{ font-size: 24px; background: #cddc39; width: 100%; position: absolute; height: 50px; line-height: 50px; top: 22px; text-align: center; }
+#output-text											{ font-size: 24px; background: #00e676; width: 100%; position: absolute; height: 50px; line-height: 50px; top: 22px; text-align: center; }
 
 #render-area 											{ background: #cddc39; }
 

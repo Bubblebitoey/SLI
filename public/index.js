@@ -24,6 +24,7 @@ jQuery(document).ready(function ($) {
     gestureCreationArea = $('#gesture-creation-area'),
     creationForm = $('#new-gesture-form'),
     existingGestureList = $("#existing-gestures"),
+    debugMode = $('#debug-mode'),
     newGestureName = $('#new-gesture-name'),
     renderArea = $('#render-area'),
     main = $('#main'),
@@ -198,7 +199,8 @@ jQuery(document).ready(function ($) {
     }, 3000);
   }
 
-  var impl, t = [],
+  var impl, d = [],
+    t = [],
     s = [],
     cs = [];
 
@@ -206,7 +208,6 @@ jQuery(document).ready(function ($) {
    * This function adds an option to a select list
    */
   function setupOptionList(rt, t, list, implName) {
-
     if (rt) {
       rt = rt();
       if (t.indexOf(rt) == -1) {
@@ -217,12 +218,30 @@ jQuery(document).ready(function ($) {
   }
 
   /*
+   * Add debug mode options
+   */
+  setupOptionList(() => "Off", d, debugMode, false);
+  setupOptionList(() => "On", d, debugMode, true);
+
+  debugMode.change(function () {
+    var debug = this.value
+    if (debug === "true") {
+      console.log("Start 'debug' mode");
+      existingGestureList.css('display', '')
+    } else {
+      console.log("Start 'normal' mode");
+      existingGestureList.css({
+        display: 'none'
+      })
+    }
+    optionsUpdated();
+  });
+
+  /*
    * We populate the recording triggers, recording strategies, and recognition strategies option lists.
    */
   for (var implName in LeapTrainer) {
-
     impl = LeapTrainer[implName].prototype;
-
     setupOptionList(impl.getRecordingTriggerStrategy, t, recordingTriggers, implName);
     setupOptionList(impl.getFrameRecordingStrategy, s, recordingStrategies, implName);
     setupOptionList(impl.getRecognitionStrategy, cs, recogStrategies, implName);
@@ -395,7 +414,7 @@ jQuery(document).ready(function ($) {
 
     unselectAllGestures(true);
 
-    //existingGestureList.find('li').removeClass('selected');
+    existingGestureList.find('li').removeClass('selected');
 
     body.removeClass('overlay-open'); // This is what makes the overlay and shade invisible again.
 
@@ -728,11 +747,7 @@ jQuery(document).ready(function ($) {
    * ------------------------------------------------------------------------------------------
    */
 
-  /*
-   * When a new gesture is created by the trainer, an entry is added to the gestures list.
-   */
-  trainer.on('gesture-created', function (gestureName, trainingSkipped) {
-
+  function registerGesture(gestureName, trainingSkipped) {
     /*
      * Since a new gesture is being created, we need to add an entry in the gesture list
      */
@@ -746,18 +761,13 @@ jQuery(document).ready(function ($) {
     }); //Clicking on the gesture will open the export/retrain overlay
 
     var items = existingGestureList.find('li');
-
     if (items.length == 0) {
-
       existingGestureList.append(gesture);
-
     } else {
-
       /*
        * If there are already other gestures in the list we make sure to unselect any currently selected.
        */
-      // unselectAllGestures(true);
-
+      unselectAllGestures(true);
       $("#existing-gestures li").first().before(gesture);
     }
 
@@ -774,13 +784,19 @@ jQuery(document).ready(function ($) {
      */
     newGestureName.val('');
     newGestureName.blur();
+  }
+
+  /*
+   * When a new gesture is created by the trainer, an entry is added to the gestures list.
+   */
+  trainer.on('gesture-created', function (gestureName, trainingSkipped) {
+    registerGesture(gestureName, trainingSkipped)
 
     /*
      * Finally we add the new gesture to the interface configuration option lists, so that the new gesture 
      * can be selected to associate it with interface functions.
      */
     openConfiguration.append('<option value="' + gestureName + '">' + gestureName + '</option>');
-
     closeConfiguration.append('<option value="' + gestureName + '">' + gestureName + '</option>');
   });
 
