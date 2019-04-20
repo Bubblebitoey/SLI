@@ -5,12 +5,14 @@
   "main": "index.js",
   "repository": "https://github.com/Bubblebitoey/SLI",
   "author": "Soraya Saenna",
-  "contributors": ["Kamontat Chantrachirathumrong"],
+  "contributors": [
+    "Kamontat Chantrachirathumrong"
+  ],
   "license": "MIT",
   "scripts": {
-    "start": "http-server . -p 1234",
+    "start": "http-server . -p 1234"
   },
   "dependencies": {
-    "http-server": "0.11.1",
+    "http-server": "0.11.1"
   }
 }
