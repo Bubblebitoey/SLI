@@ -4,9 +4,10 @@
   "description": "sign language interpreter",
   "main": "index.js",
   "repository": "https://github.com/Bubblebitoey/SLI",
-  "author": "Soraya Saenna",
   "contributors": [
-    "Kamontat Chantrachirathumrong"
+    "Soraya Saenna",
+    "Kamontat Chantrachirathumrong",
+    "Palita Samrongpol"
   ],
   "license": "MIT",
   "scripts": {
