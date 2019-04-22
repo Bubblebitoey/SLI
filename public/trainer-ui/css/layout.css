@@ -43,7 +43,11 @@ body 				{ font-family: Calibri; margin: 0px; -ms-touch-action: none; overflow-x
 .overlay-open #overlay-shade							{ display: block; }
 .overlay-open #overlay									{ display: block; }
 
+<<<<<<< HEAD:trainer-ui/css/layout.css
 #output-text											{ font-size: 24px; background: #cddc39; width: 100%; position: absolute; height: 50px; line-height: 50px; top: 22px; text-align: center; }
+=======
+#output-text											{ font-size: 24px; background: #00e676; width: 100%; position: absolute; height: 50px; line-height: 50px; top: 22px; text-align: center; }
+>>>>>>> 54f58c55f1e1841e633771caeab56da03877b4e2:public/trainer-ui/css/layout.css
 
 #render-area 											{ background: #cddc39; }
 

@@ -3,18 +3,16 @@
 <html>
 
 <head>
-  <title>SLI UI</title>
+  <title>Sign language interpreter</title>
 
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-
   <link type="text/css" rel="stylesheet" href="./trainer-ui/css/layout.css" />
 </head>
 
 <body>
 
   <div id="main">
-
-    <div id="gesture-creation-area">
+    <div id="gesture-creation-area" style="display: none">
       <form id="new-gesture-form">
         <input type="text" id="new-gesture-name" value="Create a Gesture" maxlength="15" autocomplete="off" />
         <input type="submit" id="create-new-gesture" value="Create" class="button" />
@@ -22,19 +20,29 @@
       <img src="./trainer-ui/images/create-arrow.png" />
     </div>
 
-    <ul id="existing-gestures"></ul>
+    <ul id="existing-gestures" style="display: none"></ul>
     <div id="output-text"></div>
     <div id="render-area"></div>
 
     <input id="options-button" type="button" value="Options" class="button" />
-
-
   </div>
 
   <div id="options">
 
     <table>
       <tbody>
+        <tr>
+          <td class="label">Debug</td>
+          <td>
+            <select id="debug-mode"></select>
+          </td>
+        </tr>
+
+        <tr>
+          <td class="label">&nbsp;</td>
+          <td>&nbsp;</td>
+        </tr>
+
         <tr>
           <td class="label">Recording Trigger</td>
           <td>
@@ -163,6 +171,21 @@
 
 </body>
 
+<script src="https://www.gstatic.com/firebasejs/5.10.0/firebase.js"></script>
+
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCFzymwuiLZUAlIZAy_RLpQL3JZVPjiqpE",
+    authDomain: "sign-language-interpreter-ku.firebaseapp.com",
+    databaseURL: "https://sign-language-interpreter-ku.firebaseio.com",
+    projectId: "sign-language-interpreter-ku",
+    storageBucket: "sign-language-interpreter-ku.appspot.com",
+    messagingSenderId: "381950485050"
+  };
+  firebase.initializeApp(config);
+</script>
+
 <script src="./trainer-ui/js/jquery.min.js"></script>
 <script src="./trainer-ui/js/jquery.touchwipe.min.js"></script>
 
@@ -172,8 +195,11 @@
 <script src="./trainer-ui/js/orbit-controls.js"></script>
 
 <!-- A local copy of the Leap Motion Javascript API is useful during testing-->
-<script src="./lib/leap.js"></script>
+
+<!-- <script src="https://js.leapmotion.com/leap-0.6.4.min.js"></script> -->
 <!-- script src="http://js.leapmotion.com/0.2.0/leap.min.js"></script -->
+<script src="./lib/leap.js"></script>
+<!-- <script src="./lib/leap-0.6.4.min.js"></script> -->
 
 <script src="./leap-trainer.js"></script>
 

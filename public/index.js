@@ -17,6 +17,11 @@ jQuery(document).ready(function ($) {
   var trainer = new LeapTrainer.Controller();
 
   /*
+   * Firebase data to setting globally
+   */
+  var database = firebase.database();
+
+  /*
    * We get the DOM crawling done now during setup, so it's not consuming cycles at runtime.
    */
   var win = $(window),
@@ -24,6 +29,7 @@ jQuery(document).ready(function ($) {
     gestureCreationArea = $('#gesture-creation-area'),
     creationForm = $('#new-gesture-form'),
     existingGestureList = $("#existing-gestures"),
+    debugMode = $('#debug-mode'),
     newGestureName = $('#new-gesture-name'),
     renderArea = $('#render-area'),
     main = $('#main'),
@@ -119,6 +125,77 @@ jQuery(document).ready(function ($) {
 
 
   /*
+   * Update local options to firebase setting
+   */
+  function preloadLocalConfig(obj) {
+    if (obj.debug) {
+      debugMode.val(obj.debug.value)
+      modifyDebugMode(obj.debug.value)
+    }
+
+    if (obj.recordingTriggers) {
+      recordingTriggers.val(obj.recordingTriggers.value)
+      modifyController('recordingTriggers', obj.recordingTriggers.value);
+    }
+
+    if (obj.recordingStrategies) {
+      recordingStrategies.val(obj.recordingStrategies.value)
+      modifyController('recordingStrategies', obj.recordingStrategies.value);
+    }
+
+    if (obj.recogStrategies) {
+      recogStrategies.val(obj.recogStrategies.value)
+      modifyController('recogStrategies', obj.recogStrategies.value);
+    }
+
+    if (obj.minRecordingVelocity)
+      setupOptionInput('minRecordingVelocity', {
+        default: obj.minRecordingVelocity.value,
+        force: true
+      });
+    if (obj.maxRecordingVelocity)
+      setupOptionInput('maxRecordingVelocity', {
+        default: obj.maxRecordingVelocity.value,
+        force: true
+      });
+    if (obj.minGestureFrames)
+      setupOptionInput('minGestureFrames', {
+        default: obj.minGestureFrames.value,
+        force: true
+      });
+    if (obj.minPoseFrames)
+      setupOptionInput('minPoseFrames', {
+        default: obj.minPoseFrames.value,
+        force: true
+      });
+    if (obj.hitThreshold)
+      setupOptionInput('hitThreshold', {
+        default: obj.hitThreshold.value,
+        force: true
+      });
+    if (obj.trainingGestures)
+      setupOptionInput('trainingGestures', {
+        default: obj.trainingGestures.value,
+        force: true
+      });
+    if (obj.convolutionFactor)
+      setupOptionInput('convolutionFactor', {
+        default: obj.convolutionFactor.value,
+        force: true
+      });
+    if (obj.downtime)
+      setupOptionInput('downtime', {
+        default: obj.downtime.value,
+        force: true
+      });
+  }
+
+  var ref = database.ref('settings/1');
+  ref.on('value', function (snapshot) {
+    preloadLocalConfig(snapshot.val())
+  });
+
+  /*
    * ------------------------------------------------------------------------------------------
    *  2. Setting up the options panel
    * ------------------------------------------------------------------------------------------
@@ -191,14 +268,31 @@ jQuery(document).ready(function ($) {
   /*
    * The option inputs are populated with the available trainer implementations and event listeners bound to them
    */
-  function optionsUpdated() {
-    updateConfirmation.show();
-    setTimeout(function () {
-      updateConfirmation.hide();
-    }, 3000);
+  function optionsUpdated(options) {
+    if (!options) {
+      options = {
+        id: '0',
+        name: 'unknown',
+        value: +new Date()
+      }
+    }
+
+    if (!options.id) {
+      options.id = '1'
+    }
+
+    database.ref(`settings/${options.id}/${options.name}`).set({
+      value: options.value
+    }).then(() => {
+      updateConfirmation.show();
+      setTimeout(() => {
+        updateConfirmation.hide();
+      }, 3000);
+    })
   }
 
-  var impl, t = [],
+  var impl, d = [],
+    t = [],
     s = [],
     cs = [];
 
@@ -206,7 +300,6 @@ jQuery(document).ready(function ($) {
    * This function adds an option to a select list
    */
   function setupOptionList(rt, t, list, implName) {
-
     if (rt) {
       rt = rt();
       if (t.indexOf(rt) == -1) {
@@ -217,12 +310,53 @@ jQuery(document).ready(function ($) {
   }
 
   /*
+   * Add debug mode options
+   */
+  function modifyDebugMode(debug) {
+    if (debug === "true") {
+      console.log("Start 'debug' mode");
+      var outputTextLeft = (windowWidth < 1000) ? 100 : 22;
+
+      existingGestureList.css({
+        'display': ''
+      })
+      gestureCreationArea.css({
+        'display': ''
+      })
+      outputText.css({
+        left: outputTextLeft
+      })
+    } else {
+      console.log("Start 'normal' mode");
+
+      existingGestureList.css({
+        display: 'none'
+      })
+      gestureCreationArea.css({
+        'display': 'none'
+      })
+      outputText.css({
+        left: '0px'
+      })
+    }
+  }
+
+  setupOptionList(() => "Off", d, debugMode, false);
+  setupOptionList(() => "On", d, debugMode, true);
+
+  debugMode.change(function () {
+    modifyDebugMode(this.value)
+    optionsUpdated({
+      name: 'debug',
+      value: this.value
+    });
+  });
+
+  /*
    * We populate the recording triggers, recording strategies, and recognition strategies option lists.
    */
   for (var implName in LeapTrainer) {
-
     impl = LeapTrainer[implName].prototype;
-
     setupOptionList(impl.getRecordingTriggerStrategy, t, recordingTriggers, implName);
     setupOptionList(impl.getFrameRecordingStrategy, s, recordingStrategies, implName);
     setupOptionList(impl.getRecognitionStrategy, cs, recogStrategies, implName);
@@ -231,8 +365,8 @@ jQuery(document).ready(function ($) {
   /*
    * This function merges a function from one controller class into another
    */
-  function modifyController(replacementController) {
-
+  function modifyController(name, replacementController) {
+    var value = replacementController
     replacementController = LeapTrainer[replacementController];
 
     var fields = replacementController.overidden;
@@ -253,40 +387,52 @@ jQuery(document).ready(function ($) {
       }
     }
 
-    optionsUpdated();
+    optionsUpdated({
+      name,
+      value
+    });
   }
 
   /*
    * This really needs to be swapped out for something more reliable!
    */
   recordingTriggers.change(function () {
-    modifyController(recordingTriggers.val());
+    modifyController('recordingTriggers', recordingTriggers.val());
   });
   recordingStrategies.change(function () {
-    modifyController(recordingStrategies.val());
+    modifyController('recordingStrategies', recordingStrategies.val());
   });
   recogStrategies.change(function () {
-    modifyController(recogStrategies.val());
+    modifyController('recogStrategies', recogStrategies.val());
   });
 
   /*
    * This function updates a variable in the controller with a new value from one of the option input boxes.
    */
-  function setupOptionInput(binding) {
-
+  function setupOptionInput(binding, options) {
     var input = $('#' + binding);
+    if (!options) options = {
+      default: undefined,
+      force: false,
+    }
 
-    input.val(trainer[binding]);
+    input.val(options.default ? options.default : trainer[binding]);
 
-    input.blur(function () {
-
+    if (options.force) {
       var val = input.val();
-
-      if (val != trainer[binding]) {
-        trainer[binding] = val;
-        optionsUpdated();
-      }
-    });
+      trainer[binding] = val;
+    } else {
+      input.blur(function () {
+        var val = input.val();
+        if (val != trainer[binding]) {
+          trainer[binding] = val;
+          optionsUpdated({
+            name: binding,
+            value: val
+          });
+        }
+      });
+    }
   }
 
   setupOptionInput('minRecordingVelocity');
@@ -304,18 +450,22 @@ jQuery(document).ready(function ($) {
   var openConfigGesture = null,
     closeConfigGesture = null;
 
-  function registerUIGesture(oldGesture, newGesture, func) {
+  function registerUIGesture(name, oldGesture, newGesture, func) {
     trainer.off(oldGesture, func);
     trainer.on(newGesture, func);
-    optionsUpdated();
+    optionsUpdated({
+      name: name,
+      value: newGesture
+    });
     return newGesture;
   }
 
   openConfiguration.change(function () {
-    openConfigGesture = registerUIGesture(openConfigGesture, openConfiguration.val(), openOptions);
+    openConfigGesture = registerUIGesture('openConfigGesture', openConfigGesture, openConfiguration.val(), openOptions);
   });
+
   closeConfiguration.change(function () {
-    closeConfigGesture = registerUIGesture(closeConfigGesture, closeConfiguration.val(), closeOptions);
+    closeConfigGesture = registerUIGesture('closeConfigGesture', closeConfigGesture, closeConfiguration.val(), closeOptions);
   });
 
   /*
@@ -395,7 +545,7 @@ jQuery(document).ready(function ($) {
 
     unselectAllGestures(true);
 
-    //existingGestureList.find('li').removeClass('selected');
+    existingGestureList.find('li').removeClass('selected');
 
     body.removeClass('overlay-open'); // This is what makes the overlay and shade invisible again.
 
@@ -728,11 +878,7 @@ jQuery(document).ready(function ($) {
    * ------------------------------------------------------------------------------------------
    */
 
-  /*
-   * When a new gesture is created by the trainer, an entry is added to the gestures list.
-   */
-  trainer.on('gesture-created', function (gestureName, trainingSkipped) {
-
+  function registerGesture(gestureName, trainingSkipped) {
     /*
      * Since a new gesture is being created, we need to add an entry in the gesture list
      */
@@ -746,18 +892,13 @@ jQuery(document).ready(function ($) {
     }); //Clicking on the gesture will open the export/retrain overlay
 
     var items = existingGestureList.find('li');
-
     if (items.length == 0) {
-
       existingGestureList.append(gesture);
-
     } else {
-
       /*
        * If there are already other gestures in the list we make sure to unselect any currently selected.
        */
-      // unselectAllGestures(true);
-
+      unselectAllGestures(true);
       $("#existing-gestures li").first().before(gesture);
     }
 
@@ -774,13 +915,19 @@ jQuery(document).ready(function ($) {
      */
     newGestureName.val('');
     newGestureName.blur();
+  }
+
+  /*
+   * When a new gesture is created by the trainer, an entry is added to the gestures list.
+   */
+  trainer.on('gesture-created', function (gestureName, trainingSkipped) {
+    registerGesture(gestureName, trainingSkipped)
 
     /*
      * Finally we add the new gesture to the interface configuration option lists, so that the new gesture 
      * can be selected to associate it with interface functions.
      */
     openConfiguration.append('<option value="' + gestureName + '">' + gestureName + '</option>');
-
     closeConfiguration.append('<option value="' + gestureName + '">' + gestureName + '</option>');
   });
 
