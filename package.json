@@ -12,7 +12,8 @@
   "license": "MIT",
   "scripts": {
     "start": "http-server . -p 3000",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "deploy": "netlify deploy --prod --dir=public"
   },
   "dependencies": {
     "finalhandler": "1.1.1",
