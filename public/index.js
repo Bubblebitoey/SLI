@@ -314,7 +314,6 @@ jQuery(document).ready(function ($) {
    */
   function modifyDebugMode(debug) {
     if (debug === "true") {
-      console.log("Start 'debug' mode");
       var outputTextLeft = (windowWidth < 1000) ? 100 : 22;
 
       existingGestureList.css({
@@ -327,8 +326,6 @@ jQuery(document).ready(function ($) {
         left: outputTextLeft
       })
     } else {
-      console.log("Start 'normal' mode");
-
       existingGestureList.css({
         display: 'none'
       })
@@ -518,7 +515,6 @@ jQuery(document).ready(function ($) {
     var dat = JSON.parse(localStorage.getItem('dat'));
 
     console.log(json.name ? json.name : "No name");
-
     body.addClass('overlay-open'); // This is what makes the overlay and the shade visible
 
     overlayOpen = true;
@@ -636,9 +632,9 @@ jQuery(document).ready(function ($) {
      * The font of the output text is also scaled with the window width
      */
     outputText.css({
-      left: outputTextLeft,
+      left: '0px',
       width: windowWidth - outputTextLeft - 22,
-      fontSize: Math.max(22, windowWidth / 55)
+      fontSize: Math.min(Math.max(windowWidth / 50, 22), 30)
     });
 
     /*
