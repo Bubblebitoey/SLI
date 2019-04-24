@@ -217,7 +217,7 @@ body {
 }
 
 #output-text {
-  background: #00e676;
+  background: transparent;
   width: 100%;
   position: absolute;
   height: 50px;

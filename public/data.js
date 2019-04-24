@@ -6,6 +6,6 @@ var array = [
   JSON.stringify(lateMorning),
   JSON.stringify(lost),
   JSON.stringify(motorbike),
-  JSON.stringify(one),
-  JSON.stringify(two),
+  // JSON.stringify(one),
+  // JSON.stringify(two),
 ]
